@@ -43,12 +43,12 @@
                 <version>3.0.0</version>
                 <configuration>
                     <mainClass>org.habittracker.Main</mainClass>
-<!--                    <arguments>-->
-<!--                        <argument>&#45;&#45;module-path</argument>-->
-<!--                        <argument>${javafx.module.path}</argument>-->
-<!--                        <argument>&#45;&#45;add-modules</argument>-->
-<!--                        <argument>javafx.controls,javafx.fxml</argument>-->
-<!--                    </arguments>-->
+                    <arguments>
+                        <argument>--module-path</argument>
+                        <argument>${javafx.module.path}</argument>
+                        <argument>--add-modules</argument>
+                        <argument>javafx.controls,javafx.fxml</argument>
+                    </arguments>
                 </configuration>
             </plugin>
         </plugins>
@@ -57,7 +57,7 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-<!--        <javafx.module.path>C:\Program Files\openjfx\javafx-sdk-17.0.12\lib</javafx.module.path>-->
+        <javafx.module.path>C:\PROGRA~1\openjfx\javafx-sdk-17.0.12\lib</javafx.module.path>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
