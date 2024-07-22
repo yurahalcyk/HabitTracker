@@ -1,0 +1,29 @@
+PREMISE:
+- Create a habit tracker with the ability to create new user accounts to track personalised habits that the user is trying
+to implement into their life.
+
+FLOW:
+- Create a new user or login to already created account
+- if new user: prompted what habits they want to implement into their life
+- if user exists: habits page loads
+- user will then be able to toggle months and weeks within month to see the habits they want to complete for each day
+- the days will be presented in a list, with each element being able to be expanded to display the habits
+- the user will then work through each day ticking off the habit completed
+- this data should be saved to a database so the user can track whether or not they are building the habit
+
+INITIAL HABIT PAGE:
+- habit page will consist a month toggler and week toggler
+- days will be broken down in a list, with the predetermined habits pre populating each day for the week and month
+- allow for user to edit each habit within the list with notes
+- the user should be able to tick off completed habits
+
+WRITE UNIT TESTS ALONGSIDE BUILDING THE PROJECT TO ENSURE THINGS ARE WORKING
+
+STEPS:
+1) Project setup -> install relevant maven dependencies e.g. javafx, sqlite, junit etc
+2) Create new user creation functionality
+    - create sqlite database - user table
+    - create user dto & dao
+    - start building simple ui and connect the ui with the backend functionality
+
+todo: create javafx ui
