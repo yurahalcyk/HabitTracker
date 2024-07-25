@@ -18,20 +18,14 @@ public class UserDAO {
         databasePropertiesLoader = new PropertiesLoader("database.properties");
     }
 
-    public boolean registerUser(UserDTO user) {
+    public boolean registerUser(String username, String password) {
         String registerUserSql = databasePropertiesLoader.getProperty("registerUser");
-
-        if (isUsernameTaken(user.getUsername())) {
-            System.out.println("Username is already taken.");
-            return false;
-        }
 
         try (Connection conn = db.connect()) {
             PreparedStatement pstmt = conn.prepareStatement(registerUserSql);
-            pstmt.setString(1, user.getUsername());
-            pstmt.setString(2, user.getPassword());
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
             pstmt.executeUpdate();
-            System.out.println("User created successfully.");
             return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -49,7 +43,6 @@ public class UserDAO {
             if (rs.next()) {
                 userDTO.setUsername(rs.getString("username"));
                 userDTO.setPassword(rs.getString("password"));
-                System.out.println("User found. Logging in....");
                 return userDTO;
             }
         } catch (SQLException e) {
