@@ -17,10 +17,12 @@ public class DatabaseSetup {
     }
 
     public void createDatabaseAndTables(){
-        String createTableSql = propertiesLoader.getProperty("databaseSchema");
+        String createUserTableSql = propertiesLoader.getProperty("userDatabaseSchema");
+        String createHabitTableSql = propertiesLoader.getProperty("habitsDatabaseSchema");
         try (Connection conn = this.connect()){
             if (conn != null) {
-                createTables(conn, createTableSql);
+                createTables(conn, createUserTableSql);
+                createTables(conn, createHabitTableSql);
             }
         } catch (Exception e) {
             System.out.println("createDatabaseAndTables() failed: " + e.getMessage());

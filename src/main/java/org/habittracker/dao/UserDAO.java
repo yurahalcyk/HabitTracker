@@ -41,6 +41,7 @@ public class UserDAO {
             pstmt.setString(2, password);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
+                userDTO.setId(rs.getInt("id"));
                 userDTO.setUsername(rs.getString("username"));
                 userDTO.setPassword(rs.getString("password"));
                 return userDTO;

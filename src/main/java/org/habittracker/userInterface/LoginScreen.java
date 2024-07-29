@@ -1,6 +1,5 @@
 package org.habittracker.userInterface;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,22 +9,26 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
+import lombok.Getter;
+import org.habittracker.Main;
 import org.habittracker.dao.UserDAO;
 import org.habittracker.dto.UserDTO;
 
-public class LoginPage extends Application {
+public class LoginScreen {
     private UserDAO userDAO;
+    public HabitScreen habitScreen;
+    @Getter
+    public Scene scene;
+    public Main mainApp;
 
-    public static void main(String[] args) {
-        launch(args);
+    public LoginScreen(Main mainApp) {
+        this.mainApp = mainApp;
+        createLoginScreen();
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void createLoginScreen() {
 
         userDAO = new UserDAO();
-
         BorderPane root = new BorderPane();
 
         GridPane grid = new GridPane();
@@ -74,11 +77,7 @@ public class LoginPage extends Application {
         loginButton.setOnAction(e -> {handleLoginButtonAction(usernameInput.getText(), passwordInput.getText());});
         registerButton.setOnAction(e -> {handleRegisterButtonAction(usernameInput.getText(), passwordInput.getText());});
 
-        Scene scene=new Scene(root);
-        primaryStage.setTitle("Login page");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
+        scene = new Scene(root);
 //        Platform.runLater(() -> {
 //            double labelWidth = registerButton.getWidth();
 //            System.out.println("Label Width: " + labelWidth);
@@ -109,7 +108,7 @@ public class LoginPage extends Application {
             UserDTO user = userDAO.loginUser(username, password);
             if (user != null) {
                 informationAlert("Login", "Login Successful");
-                // proceed to habit tracker main application
+                mainApp.showHabitScreen();
             } else {
                 errorAlert("Attempted Login", "Invalid username or password");
             }
@@ -122,7 +121,7 @@ public class LoginPage extends Application {
             boolean user = userDAO.registerUser(username, password);
             if (user) {
                 informationAlert("Registration", "Registration Successful");
-                // proceed to habit tracker main application
+                mainApp.showHabitScreen();
             } else {
                 errorAlert("Registration", "Invalid username or password");
             }
