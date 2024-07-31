@@ -15,8 +15,7 @@ import org.habittracker.dao.UserDAO;
 import org.habittracker.dto.UserDTO;
 
 public class LoginScreen {
-    private UserDAO userDAO;
-    public HabitScreen habitScreen;
+    public UserDAO userDAO;
     @Getter
     public Scene scene;
     public Main mainApp;
@@ -108,7 +107,8 @@ public class LoginScreen {
             UserDTO user = userDAO.loginUser(username, password);
             if (user != null) {
                 informationAlert("Login", "Login Successful");
-                mainApp.showHabitScreen();
+                mainApp.setUserDTO(user);
+                mainApp.showHabitScreen(user);
             } else {
                 errorAlert("Attempted Login", "Invalid username or password");
             }
@@ -120,8 +120,7 @@ public class LoginScreen {
         if (!isUsernameTaken) {
             boolean user = userDAO.registerUser(username, password);
             if (user) {
-                informationAlert("Registration", "Registration Successful");
-                mainApp.showHabitScreen();
+                informationAlert("Registration", "Registration Successful. Please log in.");
             } else {
                 errorAlert("Registration", "Invalid username or password");
             }

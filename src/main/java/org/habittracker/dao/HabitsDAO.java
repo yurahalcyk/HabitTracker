@@ -2,6 +2,7 @@ package org.habittracker.dao;
 
 import org.habittracker.database.DatabaseSetup;
 import org.habittracker.dto.HabitsDTO;
+import org.habittracker.dto.UserDTO;
 import org.habittracker.utility.PropertiesLoader;
 
 import java.sql.Connection;
@@ -14,28 +15,34 @@ import java.util.List;
 public class HabitsDAO {
     private PropertiesLoader databasePropertiesLoader;
     DatabaseSetup db = new DatabaseSetup();
-    HabitsDTO habitsDTO = new HabitsDTO();
 
     public HabitsDAO() {
         databasePropertiesLoader = new PropertiesLoader("database.properties");
     }
 
-    public void addHabit(int userId, String habitName, String desc) {
+    public int addHabit(int userId, String habitName) {
+        int habitId = 0;
         String addHabitSql = databasePropertiesLoader.getProperty("addHabit");
         try (Connection conn = db.connect()){
             PreparedStatement pstmt = conn.prepareStatement(addHabitSql);
             pstmt.setInt(1, userId);
             pstmt.setString(2, habitName);
-            pstmt.setString(3, desc);
             pstmt.executeUpdate();
+
+            ResultSet generatedKey = pstmt.getGeneratedKeys();
+            if (generatedKey.next()) {
+                habitId = generatedKey.getInt(1);
+            }
+
         } catch (SQLException e) {
             System.out.println("addHabit failed: " + e.getMessage());
         }
+        return habitId;
     }
 
-    public List<String> getHabitsByUser(int userId) {
+    public List<HabitsDTO> getHabitsByUser(int userId) {
         String getHabitsSql = databasePropertiesLoader.getProperty("getHabits");
-        List<String> habits = new ArrayList<>();
+        List<HabitsDTO> habits = new ArrayList<>();
 
         try (Connection conn = db.connect()){
             PreparedStatement pstmt = conn.prepareStatement(getHabitsSql);
@@ -43,22 +50,20 @@ public class HabitsDAO {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()){
-                habits.add(rs.getString("habit_name"));
+                habits.add(new HabitsDTO(rs.getInt("id"), rs.getInt("user_id"), rs.getString("habit_name")));
             }
-            System.out.println(habits);
         } catch (SQLException e) {
             System.out.println("getHabitsByUser failed: " + e.getMessage());
         }
         return habits;
     }
 
-    public void updateHabit(int habitId, String habitName, String desc) {
+    public void updateHabit(int habitId, String habitName) {
         String updateHabitSql = databasePropertiesLoader.getProperty("updateHabit");
         try (Connection conn = db.connect()) {
             PreparedStatement pstmt = conn.prepareStatement(updateHabitSql);
             pstmt.setString(1, habitName);
-            pstmt.setString(2, desc);
-            pstmt.setInt(3, habitId);
+            pstmt.setInt(2, habitId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("updateHabit failed: " + e.getMessage());

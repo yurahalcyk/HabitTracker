@@ -7,5 +7,15 @@ public class HabitsDTO {
     public int id;
     public int userId;
     public String habitName;
-    public String habitDescription;
+
+    public HabitsDTO () {};
+    public HabitsDTO (int id, String habitName) {
+        this.id = id;
+        this.habitName = habitName;
+    }
+    public HabitsDTO(int id, int userId, String habitName) {
+        this.id = id;
+        this.userId = userId;
+        this.habitName = habitName;
+    }
 }
