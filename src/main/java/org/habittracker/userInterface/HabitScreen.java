@@ -1,21 +1,23 @@
 package org.habittracker.userInterface;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import lombok.Getter;
 import org.habittracker.dao.HabitsDAO;
 import org.habittracker.dto.HabitsDTO;
 import org.habittracker.dto.UserDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HabitScreen {
@@ -23,7 +25,9 @@ public class HabitScreen {
     public UserDTO userDTO;
     @Getter
     private Scene scene;
-    ObservableList<HabitsDTO> data = FXCollections.observableArrayList();
+    private TextField habitNameTF;
+    private ObservableList<HabitsDTO> data;
+    private TableView<HabitsDTO> table;
 
     public HabitScreen(UserDTO userDTO, HabitsDAO habitsDAO) {
         this.userDTO = userDTO;
@@ -34,7 +38,16 @@ public class HabitScreen {
     public void createHabitsScreen() {
 
         BorderPane root = new BorderPane();
+        root.autosize();
+
+        HBox navbar = new HBox(20);
+        navbar.setPadding(new Insets(0, 10, 10, 10));
+        navbar.setAlignment(Pos.CENTER);
+
         HBox habitsHbox = new HBox(20);
+        habitsHbox.setPadding(new Insets(10, 10, 10, 10));
+        habitsHbox.setAlignment(Pos.CENTER);
+
         List<HabitsDTO> habits = null;
 
         // populating habits with db data
@@ -44,7 +57,7 @@ public class HabitScreen {
             System.out.println("Error with fetching user habits: " + e.getMessage());
         }
 
-        TableView<HabitsDTO> table = new TableView<>();
+        table = new TableView<>();
         table.setPlaceholder(new Label("No habits to track as of yet"));
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         // populating observable list with current db data
@@ -67,9 +80,11 @@ public class HabitScreen {
                 if (empty) {
                     setText(null);
                     setStyle("");
+                    setPrefHeight(38);
                 } else {
                     setText(habit);
-                    setFont(Font.font("Arial", 14));
+                    setFont(Font.font("Arial", 16));
+                    setPrefHeight(38);
                 }
             }
         });
@@ -79,7 +94,7 @@ public class HabitScreen {
         deleteHabitColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         // setting header style of column
         deleteHabitColumn.setGraphic(createHeaderWithCustomFont("Delete Habit", "Arial", 18));
-        deleteHabitColumn.setMinWidth(50);
+        deleteHabitColumn.setMinWidth(120);
         // setting functionality of delete button in the cell
         deleteHabitColumn.setCellFactory(param-> new TableCell<HabitsDTO, HabitsDTO>() {
             final Button deleteButton = new Button("Delete");
@@ -92,6 +107,7 @@ public class HabitScreen {
                     return;
                 }
                 setGraphic(deleteButton);
+                setAlignment(Pos.CENTER);
                 deleteButton.setOnAction(e->{
                     try {
                         System.out.println("deleting habit id: " + habit.getId() + " habit name: " + habit.getHabitName());
@@ -100,6 +116,7 @@ public class HabitScreen {
                         System.out.println("Error with deleting habit: " + err.getMessage());
                     }
                     data.remove(habit);
+                    table.getSelectionModel().clearSelection();
                 });
             }
         });
@@ -112,21 +129,28 @@ public class HabitScreen {
         VBox vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 10, 10, 10));
+        vbox.setAlignment(Pos.CENTER);
         vbox.getChildren().addAll(label, table);
         VBox.setVgrow(table, Priority.ALWAYS);
+        vbox.setPrefSize(400, 300);
 
         // hbox component + button functionality
-        TextField habitname = new TextField();
-        Button addHabit = new Button("add habit");
-        Button getHabits = new Button("get habits");
+        habitNameTF = new TextField();
+        Button addHabit = new Button("Add habit");
+        Button getHabits = new Button("Get habits");
 
-        addHabit.setOnAction(e -> {handleAddHabitButtonAction(habitname.getText());});
+        // navbar component
+        Button toHome = new Button("Home");
+
+        addHabit.setOnAction(e -> {handleAddHabitButtonAction(habitNameTF.getText());});
         getHabits.setOnAction(e -> {handleGetHabitsButtonAction(userDTO.getId());});
 
-        habitsHbox.getChildren().addAll(habitname, addHabit, getHabits);
+        habitsHbox.getChildren().addAll(habitNameTF, addHabit, getHabits);
+        navbar.getChildren().addAll(toHome);
         root.setTop(habitsHbox);
         root.setCenter(vbox);
-        scene = new Scene(root, 600, 400);
+        root.setBottom(navbar);
+        scene = new Scene(root);
     }
 
     public void handleAddHabitButtonAction(String habitName){
@@ -134,6 +158,7 @@ public class HabitScreen {
             int habitId = habitsDAO.addHabit(userDTO.getId(), habitName);
             HabitsDTO newHabit = new HabitsDTO(habitId, userDTO.getId(), habitName);
             data.add(newHabit);
+            clearFields();
         } catch (Exception e) {
             System.out.println("handleAddHabitButton failed: " + e.getMessage());
         }
@@ -152,5 +177,10 @@ public class HabitScreen {
         javafx.scene.control.Label header = new javafx.scene.control.Label(text);
         header.setFont(Font.font(fontFamily, FontWeight.BOLD, size));
         return header;
+    }
+
+    public void clearFields() {
+        habitNameTF.clear();
+        habitNameTF.requestFocus();
     }
 }
